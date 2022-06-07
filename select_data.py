@@ -55,6 +55,7 @@ def select_data():
 		label.append(test_label[ind])
 
 	data = np.array(data)
+	data = data/255.0
 	label = np.array(label)
 
 	np.save('./data', data)
