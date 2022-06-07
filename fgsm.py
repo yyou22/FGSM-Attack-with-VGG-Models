@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 #device = torch.device("cuda")
 start_idx = 0
 
-def attack(model, X_data, Y_data):
+def natural(model, X_data, Y_data):
 
 	model.eval()
 
@@ -24,7 +24,6 @@ def attack(model, X_data, Y_data):
 
 		# load original image
 		image = np.array(np.expand_dims(X_data[idx], axis=0), dtype=np.float32)
-		image = np.transpose(image, (0, 3, 1, 2))
 
 		# load label
 		label = np.array([Y_data[idx]], dtype=np.int64)
@@ -49,10 +48,10 @@ def main():
 
 	model = resnet18(pretrained=True)
 
-	X_data = np.load("./data.npy")
-	Y_data = np.load("./label.npy")
+	X_data = np.load("./data_3.npy")
+	Y_data = np.load("./label_3.npy")
 
-	attack(model, X_data, Y_data)
+	natural(model, X_data, Y_data)
 
 if __name__ == "__main__":
 	main()
