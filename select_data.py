@@ -13,22 +13,12 @@ import random
 
 torch.manual_seed(1)
 
-mean = [0.4914, 0.4822, 0.4465]
-std = [0.2471, 0.2435, 0.2616]
-
 def select_data():
 
 	hash_map = {}
 
-	transform_ = T.Compose(
-			[
-				T.ToTensor(),
-				T.Normalize(mean, std),
-			]
-		)
-
 	#retrieve test data
-	test_data_ = datasets.CIFAR10(root='./cifar10', train=False, download=True, transform=transform_)
+	test_data_ = datasets.CIFAR10(root='./cifar10', train=False, download=True, transform=T.ToTensor())
 
 	#convert to numpy array
 	test_data = test_data_.data
@@ -67,16 +57,7 @@ def select_data():
 	data = np.array(data)
 	label = np.array(label)
 
-	norm_data = []
-	data = data/255
-
-	for data_ in data:
-		data_ = transform_(data_)
-		norm_data.append(data_.numpy())
-
-	norm_data = np.array(norm_data)
-
-	np.save('./data', norm_data)
+	np.save('./data', data)
 	np.save('./label', label)
 
 def main():
