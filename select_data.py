@@ -9,9 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-torch.manual_seed(0)
-
-epsilons = [0, 0.01, 0.02, 0.03]
+torch.manual_seed(1)
 
 def select_data():
 
@@ -34,7 +32,7 @@ def select_data():
 	total = 0
 
 	while total != 100:
-		ind = random.randint(0, 10000)
+		ind = random.randint(0, 999)
 
 		#check if ind is already visited
 		if ind in visited:
