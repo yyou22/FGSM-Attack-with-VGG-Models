@@ -1,6 +1,5 @@
 from __future__ import print_function
 from cifar10_models.vgg import vgg16_bn, vgg19_bn
-from cifar10_models.resnet import resnet18
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +9,13 @@ from torch.autograd import Variable
 from torchvision import transforms as T
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+parser = argparse.ArgumentParser(description='FGSM Attack on CIFAR-10 with VGG Models')
+parser.add_argument('--natural', action='store_true', help='natural prediction on the unperturbed dataset')
+parser.add_argument('--epsilon', default=0.03, type=float, help='epsilon, the maximum amount of perturbation that can be applied')
+
+args = parser.parse_args()
 
 #device = torch.device("cuda")
 start_idx = 0
@@ -20,7 +26,7 @@ std = [0.2471, 0.2435, 0.2616]
 inv_mean = [-0.4914/0.2471, -0.4822/0.2435, -0.4465/0.2616]
 inv_std = [1/0.2471, 1/0.2435, 1/0.2616]
 
-epsilon = 0.03
+epsilon = args.epsilon
 
 def natural(model, X_data, Y_data):
 
@@ -87,11 +93,16 @@ def fgsm(image, epsilon, target, model):
 
 	perturbed_image = image + epsilon*sign_data_grad
 
+	perturbed_image = torch.clamp(perturbed_image, 0.0, 1.0)
+
 	return perturbed_image
 
 def attack(model, X_data, Y_data):
 
 	model.eval()
+
+	tensor_ = T.ToTensor()
+	normalize = T.Normalize(mean, std)
 
 	transform_ = T.Compose(
 			[
@@ -105,8 +116,18 @@ def attack(model, X_data, Y_data):
 	wrong = 0
 	adv_examples = []
 
-	for idx in range(start_idx, len(Y_data)):
-	#for idx in range(start_idx, 10):
+	#for idx in range(start_idx, len(Y_data)):
+	for idx in range(start_idx, 10):
+
+		#display image
+		plt.imshow(X_data[idx])
+		plt.show()
+
+		un_x_data = tensor_(X_data[idx])
+		un_x_data = un_x_data.numpy()
+
+		# load unnormalized original image
+		un_image = np.array(np.expand_dims(un_x_data, axis=0), dtype=np.float32)
 
 		x_data = transform_(X_data[idx])
 		x_data = x_data.numpy()
@@ -118,10 +139,12 @@ def attack(model, X_data, Y_data):
 		label = np.array([Y_data[idx]], dtype=np.int64)
 
 		# transform to torch.tensor
-		data = torch.from_numpy(image)
+		data = torch.from_numpy(un_image)
 		target = torch.from_numpy(label)
 
 		perturbed_data = fgsm(data, epsilon, target, model)
+
+		perturbed_data = normalize(perturbed_data)
 
 		X_ = Variable(perturbed_data)
 		out = model(X_)
@@ -134,9 +157,15 @@ def attack(model, X_data, Y_data):
 		#undo transformation
 		perturbed_data = inv_normalize(perturbed_data)
 
+		og_image = tensor_(X_data[idx])
+		og_image = og_image.numpy()
+
+		og_image = np.array(np.expand_dims(og_image, axis=0), dtype=np.float32)
+		diff = og_image - perturbed_data.numpy()
+
 		#display image
-		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
-		#plt.show()
+		plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
+		plt.show()
 
 	print(wrong)
 
@@ -147,8 +176,10 @@ def main():
 	X_data = np.load("./data.npy")
 	Y_data = np.load("./label.npy")
 
-	#natural(model, X_data, Y_data)
-	attack(model, X_data, Y_data)
+	if args.natural:
+		natural(model, X_data, Y_data)
+	else:
+		attack(model, X_data, Y_data)
 
 if __name__ == "__main__":
 	main()
