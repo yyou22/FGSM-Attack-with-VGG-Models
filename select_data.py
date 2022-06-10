@@ -58,8 +58,8 @@ def select_data():
 	data = data/255.0
 	label = np.array(label)
 
-	np.save('./data', data)
-	np.save('./label', label)
+	np.save('./X.npy', data)
+	np.save('./Y.npy', label)
 
 def main():
 

@@ -42,6 +42,7 @@ def natural(model, X_data, Y_data):
 		)
 
 	wrong = 0
+	confid_level = []
 
 	for idx in range(start_idx, len(Y_data)):
 
@@ -62,12 +63,26 @@ def natural(model, X_data, Y_data):
 
 		# output of model
 		out = model(X)
+		confid_level.append(out.data[0].numpy())
 		init_pred = out.data.max(1)[1]
-		
+
 		if init_pred != target:
 			wrong += 1
 
-	print(wrong)
+	confid_level = np.array(confid_level)
+
+	path = './data/' + args.model + '/000'
+
+	if not os.path.exists(path):
+		os.makedirs(path)
+
+	np.save(path + '/confid_level.npy', confid_level)
+
+	f = open(path + '/error.pckl', 'wb')
+	pickle.dump(wrong, f)
+	f.close()
+
+	print("Robust Error:" + str(wrong))
 
 def margin_loss(logits,y):
 	logit_org = logits.gather(1,y.view(-1,1))
@@ -155,7 +170,7 @@ def attack(model, X_data, Y_data):
 		confid_level.append(out.data[0].numpy())
 
 		pred = out.data.max(1)[1]
-		
+
 		if pred != target:
 			wrong += 1
 
@@ -198,8 +213,8 @@ def main():
 	elif args.model == "vgg19":
 		model = vgg19_bn(pretrained=True)
 
-	X_data = np.load("./data.npy")
-	Y_data = np.load("./label.npy")
+	X_data = np.load("./X.npy")
+	Y_data = np.load("./Y.npy")
 
 	if args.natural:
 		natural(model, X_data, Y_data)
