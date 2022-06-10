@@ -11,7 +11,7 @@ from torchvision import transforms as T
 from torch.utils.data import DataLoader
 import random
 
-torch.manual_seed(1)
+random.seed(0)
 
 def select_data():
 

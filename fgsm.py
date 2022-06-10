@@ -10,14 +10,16 @@ from torchvision import transforms as T
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import os
+import pickle
 
 parser = argparse.ArgumentParser(description='FGSM Attack on CIFAR-10 with VGG Models')
 parser.add_argument('--natural', action='store_true', help='natural prediction on the unperturbed dataset')
 parser.add_argument('--epsilon', default=0.03, type=float, help='epsilon, the maximum amount of perturbation that can be applied')
+parser.add_argument('--model', default='vgg16', help='[vgg16|vgg19], model that is being attacked')
 
 args = parser.parse_args()
 
-#device = torch.device("cuda")
 start_idx = 0
 
 mean = [0.4914, 0.4822, 0.4465]
@@ -115,13 +117,14 @@ def attack(model, X_data, Y_data):
 
 	wrong = 0
 	adv_examples = []
+	confid_level = []
 
-	#for idx in range(start_idx, len(Y_data)):
-	for idx in range(start_idx, 10):
+	for idx in range(start_idx, len(Y_data)):
+	#for idx in range(start_idx, 10):
 
 		#display image
-		plt.imshow(X_data[idx])
-		plt.show()
+		#plt.imshow(X_data[idx])
+		#plt.show()
 
 		un_x_data = tensor_(X_data[idx])
 		un_x_data = un_x_data.numpy()
@@ -149,6 +152,8 @@ def attack(model, X_data, Y_data):
 		X_ = Variable(perturbed_data)
 		out = model(X_)
 
+		confid_level.append(out.data[0].numpy())
+
 		pred = out.data.max(1)[1]
 		
 		if pred != target:
@@ -164,14 +169,34 @@ def attack(model, X_data, Y_data):
 		diff = og_image - perturbed_data.numpy()
 
 		#display image
-		plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
-		plt.show()
+		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
+		#plt.show()
 
-	print(wrong)
+		adv_examples.append(perturbed_data[0].numpy())
+
+	adv_examples = np.array(adv_examples)
+	confid_level = np.array(confid_level)
+
+	path = './data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
+
+	if not os.path.exists(path):
+		os.makedirs(path)
+
+	np.save(path + '/cifar10_adv_X.npy', adv_examples)
+	np.save(path + '/confid_level.npy', confid_level)
+
+	f = open(path + '/error.pckl', 'wb')
+	pickle.dump(wrong, f)
+	f.close()
+
+	print("Robust Error: " + str(wrong))
 
 def main():
 
-	model = vgg16_bn(pretrained=True)
+	if args.model == "vgg16":
+		model = vgg16_bn(pretrained=True)
+	elif args.model == "vgg19":
+		model = vgg19_bn(pretrained=True)
 
 	X_data = np.load("./data.npy")
 	Y_data = np.load("./label.npy")
