@@ -135,7 +135,6 @@ def attack(model, X_data, Y_data):
 	confid_level = []
 
 	for idx in range(start_idx, len(Y_data)):
-	#for idx in range(start_idx, 10):
 
 		#display image
 		#plt.imshow(X_data[idx])
@@ -184,8 +183,9 @@ def attack(model, X_data, Y_data):
 		diff = og_image - perturbed_data.numpy()
 
 		#display image
-		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
-		#plt.show()
+		#if pred != target:
+			#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
+			#plt.show()
 
 		adv_examples.append(perturbed_data[0].numpy())
 
