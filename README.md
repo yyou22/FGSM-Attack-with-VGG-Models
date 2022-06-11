@@ -33,7 +33,7 @@ If the flag `--natural` is present, it will ignore the argument passed to `--eps
 
 ## Apply t-SNE and Output CSV Files
 ```python
-python dimen_reduc.py --model [vgg16|vgg19] --epsilon [0.00|0.01|0.02|0.03]
+python dimen_reduc.py --model [vgg16|vgg19] --epsilon [0.01|0.02|0.03] [--natural]
 ```
 
 This will apply dimensionality reduction on the images and output it as a csv file `data.csv` in the corresponding path combined with confidence levels, prediction labels, and ground truth labels.

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sklearn.manifold import TSNE
 import numpy as np
 import argparse
@@ -7,6 +8,7 @@ import csv
 import os
 
 parser = argparse.ArgumentParser(description='dimesionality reduction on FGSM-perturbed CIFAR10 datasets')
+parser.add_argument('--natural', action='store_true', help='natural prediction on the unperturbed dataset')
 parser.add_argument('--epsilon', default=0.03, type=float, help='[0.00|0.01|0.02|0.03], epsilon, the maximum amount of perturbation that can be applied')
 parser.add_argument('--model', default='vgg16', help='[vgg16|vgg19], model that is being attacked')
 
@@ -21,11 +23,11 @@ def TSNE_(data):
 
 def main():
 
-	path = '../data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
-
-	if math.isclose(args.epsilon, 0.00, abs_tol=1e-8):
+	if args.natural:
+		path = '../data/' + args.model + '/000'
 		X_data = np.load("../data/X.npy")
 	else:
+		path = '../data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
 		X_data = np.load(path + '/adv_X.npy')
 
 	Y_data = np.load("../data/Y.npy")

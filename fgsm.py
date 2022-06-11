@@ -43,6 +43,7 @@ def natural(model, X_data, Y_data):
 
 	wrong = 0
 	confid_level = []
+	pred_ = []
 
 	for idx in range(start_idx, len(Y_data)):
 
@@ -66,10 +67,13 @@ def natural(model, X_data, Y_data):
 		confid_level.append(out.data[0].numpy())
 		init_pred = out.data.max(1)[1]
 
+		pred_.append(init_pred)
+
 		if init_pred != target:
 			wrong += 1
 
 	confid_level = np.array(confid_level)
+	pred_ = np.array(pred_)
 
 	path = '../data/' + args.model + '/000'
 
@@ -77,6 +81,7 @@ def natural(model, X_data, Y_data):
 		os.makedirs(path)
 
 	np.save(path + '/confid_level.npy', confid_level)
+	np.save(path + '/Y_hat.npy', pred_)
 
 	f = open(path + '/error.pckl', 'wb')
 	pickle.dump(wrong, f)
