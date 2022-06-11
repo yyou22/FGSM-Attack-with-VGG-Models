@@ -71,7 +71,7 @@ def natural(model, X_data, Y_data):
 
 	confid_level = np.array(confid_level)
 
-	path = './data/' + args.model + '/000'
+	path = '../data/' + args.model + '/000'
 
 	if not os.path.exists(path):
 		os.makedirs(path)
