@@ -176,7 +176,7 @@ def attack(model, X_data, Y_data):
 			wrong += 1
 
 		#undo transformation
-		#perturbed_data = inv_normalize(perturbed_data)
+		perturbed_data = inv_normalize(perturbed_data)
 
 		#The following code is for checking the pertubation size applied
 		#og_image = tensor_(X_data[idx])
