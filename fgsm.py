@@ -82,7 +82,7 @@ def natural(model, X_data, Y_data):
 	pickle.dump(wrong, f)
 	f.close()
 
-	print("Robust Error:" + str(wrong))
+	print("Natural Error:" + str(wrong))
 
 def margin_loss(logits,y):
 	logit_org = logits.gather(1,y.view(-1,1))
@@ -133,6 +133,7 @@ def attack(model, X_data, Y_data):
 	wrong = 0
 	adv_examples = []
 	confid_level = []
+	pred_ = []
 
 	for idx in range(start_idx, len(Y_data)):
 
@@ -169,35 +170,38 @@ def attack(model, X_data, Y_data):
 		confid_level.append(out.data[0].numpy())
 
 		pred = out.data.max(1)[1]
+		pred_.append(pred)
 
 		if pred != target:
 			wrong += 1
 
 		#undo transformation
-		perturbed_data = inv_normalize(perturbed_data)
+		#perturbed_data = inv_normalize(perturbed_data)
 
-		og_image = tensor_(X_data[idx])
-		og_image = og_image.numpy()
+		#The following code is for checking the pertubation size applied
+		#og_image = tensor_(X_data[idx])
+		#og_image = og_image.numpy()
 
-		og_image = np.array(np.expand_dims(og_image, axis=0), dtype=np.float32)
-		diff = og_image - perturbed_data.numpy()
+		#og_image = np.array(np.expand_dims(og_image, axis=0), dtype=np.float32)
+		#diff = og_image - perturbed_data.numpy()
 
 		#display image
-		#if pred != target:
-			#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
-			#plt.show()
+		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
+		#plt.show()
 
 		adv_examples.append(perturbed_data[0].numpy())
 
 	adv_examples = np.array(adv_examples)
 	confid_level = np.array(confid_level)
+	pred_ = np.array(pred_)
 
-	path = './data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
+	path = '../data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
 
 	if not os.path.exists(path):
 		os.makedirs(path)
 
-	np.save(path + '/cifar10_adv_X.npy', adv_examples)
+	np.save(path + '/adv_X.npy', adv_examples)
+	np.save(path + '/Y_hat.npy', pred_)
 	np.save(path + '/confid_level.npy', confid_level)
 
 	f = open(path + '/error.pckl', 'wb')
@@ -213,8 +217,8 @@ def main():
 	elif args.model == "vgg19":
 		model = vgg19_bn(pretrained=True)
 
-	X_data = np.load("./X.npy")
-	Y_data = np.load("./Y.npy")
+	X_data = np.load("../data/X.npy")
+	Y_data = np.load("../data/Y.npy")
 
 	if args.natural:
 		natural(model, X_data, Y_data)

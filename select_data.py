@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from torchvision import transforms as T
 from torch.utils.data import DataLoader
 import random
+import os
 
 random.seed(0)
 
@@ -58,8 +59,12 @@ def select_data():
 	data = data/255.0
 	label = np.array(label)
 
-	np.save('./X.npy', data)
-	np.save('./Y.npy', label)
+	path = "../data"
+	if not os.path.exists(path):
+		os.makedirs(path)
+
+	np.save('../data/X.npy', data)
+	np.save('../data/Y.npy', label)
 
 def main():
 
