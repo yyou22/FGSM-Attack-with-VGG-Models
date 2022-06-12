@@ -21,7 +21,7 @@ python fgsm.py --model [vgg16|vgg19] --epsilon [0.01|0.02|0.03]
 ```
 This will create sub-folders within `../data/` and store the generated outputs. An example path would be `../data/vgg16/001/[generated files]`, where `vgg16` stands for the model chosen and `001` stands for perturbation size 0.01.
 
-`adv_X.npy` stores the perturbed images as matrices, `confid_level.npy` stores the confidence levels across all classes in each prediction, `error.pckl` stores the robust error, `Y_hat.npy` stores the predicted labels.
+`adv_X.npy` stores the perturbed images as matrices, `confid_level.npy` stores the confidence levels across all classes in each prediction, `error.pckl` stores the robust error, `Y_hat.npy` stores the predicted labels, and `noise.npy` stores the applied perturbation normalized as images.
 
 ## Predict on Unperturbed Dataset
 ```python

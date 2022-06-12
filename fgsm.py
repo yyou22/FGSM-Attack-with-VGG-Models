@@ -138,6 +138,7 @@ def attack(model, X_data, Y_data):
 	wrong = 0
 	adv_examples = []
 	confid_level = []
+	noise = []
 	pred_ = []
 
 	for idx in range(start_idx, len(Y_data)):
@@ -183,12 +184,23 @@ def attack(model, X_data, Y_data):
 		#undo transformation
 		perturbed_data = inv_normalize(perturbed_data)
 
-		#The following code is for checking the pertubation size applied
-		#og_image = tensor_(X_data[idx])
-		#og_image = og_image.numpy()
+		#obtain the noise applied and save it as a matrix
+		og_image = tensor_(X_data[idx])
+		og_image = og_image.numpy()
 
-		#og_image = np.array(np.expand_dims(og_image, axis=0), dtype=np.float32)
-		#diff = og_image - perturbed_data.numpy()
+		og_image = np.array(np.expand_dims(og_image, axis=0), dtype=np.float32)
+		diff = og_image - perturbed_data.numpy()
+		diff = np.sign(diff)
+		diff = (diff+1)/2
+
+		noise.append(diff[0])
+
+		#transpose the image for display
+		#diff_ = diff[0].transpose(1 , 2 , 0)
+
+		#display noise
+		#plt.imshow(diff_)
+		#plt.show()
 
 		#display image
 		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
@@ -199,6 +211,7 @@ def attack(model, X_data, Y_data):
 	adv_examples = np.array(adv_examples)
 	confid_level = np.array(confid_level)
 	pred_ = np.array(pred_)
+	noise = np.array(noise)
 
 	path = '../data/' + args.model + '/' + ''.join(str(args.epsilon).split('.'))
 
@@ -208,6 +221,7 @@ def attack(model, X_data, Y_data):
 	np.save(path + '/adv_X.npy', adv_examples)
 	np.save(path + '/Y_hat.npy', pred_)
 	np.save(path + '/confid_level.npy', confid_level)
+	np.save(path + '/noise.npy', noise)
 
 	f = open(path + '/error.pckl', 'wb')
 	pickle.dump(wrong, f)
