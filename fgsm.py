@@ -103,6 +103,9 @@ def fgsm(image, epsilon, target, model):
 	# output of model
 	out = model(X)
 
+	#print(out.data[0])
+	#print(F.softmax(out.data[0]))
+
 	loss = margin_loss(out, target)
 
 	model.zero_grad()
@@ -175,6 +178,10 @@ def attack(model, X_data, Y_data):
 
 		confid_level.append(out.data[0].numpy())
 
+		#print confidence score
+		#print(out.data[0])
+		#print(F.softmax(out.data[0]))
+
 		pred = out.data.max(1)[1]
 		pred_.append(pred)
 
@@ -206,7 +213,7 @@ def attack(model, X_data, Y_data):
 		#plt.imshow(transforms.ToPILImage()(perturbed_data[0]))
 		#plt.show()
 
-		adv_examples.append(perturbed_data[0].numpy())
+		adv_examples.append(perturbed_data[0].numpy().transpose(1 , 2 , 0))
 
 	adv_examples = np.array(adv_examples)
 	confid_level = np.array(confid_level)
