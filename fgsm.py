@@ -64,7 +64,10 @@ def natural(model, X_data, Y_data):
 
 		# output of model
 		out = model(X)
-		confid_level.append(out.data[0].numpy())
+
+		confid_ = F.softmax(out.data[0])
+		confid_level.append(confid_.numpy())
+
 		init_pred = out.data.max(1)[1]
 
 		pred_.append(init_pred)
@@ -176,11 +179,9 @@ def attack(model, X_data, Y_data):
 		X_ = Variable(perturbed_data)
 		out = model(X_)
 
-		confid_level.append(out.data[0].numpy())
+		confid_ = F.softmax(out.data[0])
 
-		#print confidence score
-		#print(out.data[0])
-		#print(F.softmax(out.data[0]))
+		confid_level.append(confid_.numpy())
 
 		pred = out.data.max(1)[1]
 		pred_.append(pred)
