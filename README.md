@@ -31,9 +31,16 @@ If the flag `--natural` is present, it will ignore the argument passed to `--eps
 
 `confid_level.npy` stores the confidence levels across all classes in each prediction, `error.pckl` stores the natural error. The outputs will be stored in `../data/[model name]/000/`
 
+##Extract features of the VGG models
+```python
+python vgg_feature.py --model [vgg16|vgg19] --epsilon [0.01|0.02|0.03] [--natural]
+```
+
+This will save the features as `features.npy` in the corresponding folder.
+
 ## Apply t-SNE and Output CSV Files
 ```python
-python dimen_reduc.py --model [vgg16|vgg19] --epsilon [0.01|0.02|0.03] [--natural]
+python dimen_reduc.py --model [vgg16|vgg19]
 ```
 
 This will apply dimensionality reduction on the images and output it as a csv file `data.csv` in the corresponding path combined with confidence levels, prediction labels, and ground truth labels.
