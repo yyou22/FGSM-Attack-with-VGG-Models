@@ -31,7 +31,7 @@ If the flag `--natural` is present, it will ignore the argument passed to `--eps
 
 `confid_level.npy` stores the confidence levels across all classes in each prediction, `error.pckl` stores the natural error. The outputs will be stored in `../data/[model name]/000/`
 
-##Extract features of the VGG models
+## Extract features of the VGG models
 ```python
 python vgg_feature.py --model [vgg16|vgg19] --epsilon [0.01|0.02|0.03] [--natural]
 ```

@@ -49,16 +49,25 @@ def main():
 
 	X_data = X_data.reshape(X_data.shape[0], 512)
 
-	X_data = PCA_(X_data)
+	X_data_t = TSNE_(X_data)
 
-	tx, ty = X_data[:, 0].reshape(400, 1), X_data[:, 1].reshape(400, 1)
+	tx, ty = X_data_t[:, 0].reshape(400, 1), X_data_t[:, 1].reshape(400, 1)
 	tx = (tx-np.min(tx)) / (np.max(tx) - np.min(tx))
 	ty = (ty-np.min(ty)) / (np.max(ty) - np.min(ty))
 
 	tx_list = np.array_split(tx, 4)
 	ty_list = np.array_split(ty, 4)
 
-	type_ = ['%.5f'] * 12 + ['%d'] * 2
+	X_data_p = PCA_(X_data)
+
+	px, py = X_data_p[:, 0].reshape(400, 1), X_data_p[:, 1].reshape(400, 1)
+	px = (px-np.min(px)) / (np.max(px) - np.min(px))
+	py = (py-np.min(py)) / (np.max(py) - np.min(py))
+
+	px_list = np.array_split(px, 4)
+	py_list = np.array_split(py, 4)
+
+	type_ = ['%.5f'] * 14 + ['%d'] * 2
 
 	for i in range(0, 4):
 
@@ -68,8 +77,8 @@ def main():
 
 		Y_hat = Y_hat_list[i].reshape((Y_hat_list[i].shape[0], 1))
 
-		result = np.concatenate((tx_list[i], ty_list[i], confid_level, Y_hat, Y_data), axis=1)
-		np.savetxt(path + "/data.csv", result, header="xpos,ypos,0,1,2,3,4,5,6,7,8,9,pred,target", comments='', delimiter=',', fmt=type_)
+		result = np.concatenate((tx_list[i], ty_list[i], px_list[i], py_list[i], confid_level, Y_hat, Y_data), axis=1)
+		np.savetxt(path + "/data.csv", result, header="xpost,ypost,xposp,yposp,0,1,2,3,4,5,6,7,8,9,pred,target", comments='', delimiter=',', fmt=type_)
 
 if __name__ == "__main__":
 	main()
